@@ -2,7 +2,7 @@ name: Build and Push Image
 
 on:
   push:
-    branches: [main]
+    branches: ["*"]
     tags: ["v*"]
   pull_request:
     branches: [main]
@@ -38,7 +38,8 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+          type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=sha,prefix=
