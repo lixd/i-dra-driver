@@ -1,0 +1,10 @@
+apiVersion: resource.k8s.io/v1
+kind: DeviceClass
+metadata:
+  name: gopher.example.com
+spec:
+  selectors:
+  - cel:
+      expression: >-
+        device.driver == 'gopher.example.com'
+        && device.attributes['gopher.example.com'].type == 'gopher'

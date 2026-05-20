@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: i-dra-driver
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: i-dra-driver
+  template:
+    metadata:
+      labels:
+        app: i-dra-driver
+    spec:
+      serviceAccountName: i-dra-driver
+      containers:
+      - name: i-dra-driver
+        image: docker.io/lixd96/i-dra-driver:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - --node-name=$(NODE_NAME)
+        - --device-path=/etc/gophers
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - name: plugins
+          mountPath: /var/lib/kubelet/plugins
+        - name: plugins-registry
+          mountPath: /var/lib/kubelet/plugins_registry
+        - name: cdi
+          mountPath: /var/run/cdi
+        - name: gophers
+          mountPath: /etc/gophers
+          readOnly: true
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+      volumes:
+      - name: plugins
+        hostPath:
+          path: /var/lib/kubelet/plugins
+      - name: plugins-registry
+        hostPath:
+          path: /var/lib/kubelet/plugins_registry
+      - name: cdi
+        hostPath:
+          path: /var/run/cdi
+      - name: gophers
+        hostPath:
+          path: /etc/gophers
